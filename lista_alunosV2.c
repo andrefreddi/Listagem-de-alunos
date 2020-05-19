@@ -14,93 +14,178 @@ typedef struct _student {
 	float		gpa;
 } student;
 
-
-// n�
 typedef struct _node {
-	student		   k;
-	struct _node  *next; // ponteiro para o próximo elemento
-} node, *list;
+	student k; //pq k nao é ponteiro
+	struct _node *next; // ponteiro para o proximo elemento
+	struct _node *anterior;
+} node, *list; //pq list e um ponteiro
 
+struct node *ultimo = NULL;
 
-void insert_list (list *L, student k) {
-	node	*p;
-	p = (node *)malloc(sizeof(node));
-	p->k = k;
-	p->next = *L;
+void insert_list (list *L, student k){
+	node  *novo; //*p
+	novo = (node *)malloc(sizeof(node));
+	novo->k = k;
+	novo->next = *L;
 
-	*L = p;
+	*L = novo;
 }
 
-student *search_list (list L, int id) {
-	node	*p;
+student *search_list (list L, int id){
+	node	*novo;
 
-	for (p=L; p && p->k.id != id; p=p->next);
+	for(novo = L; novo && novo->k.id != id; novo= novo->next);
 
-	if (p)
-		return &p->k;
-	else
-		return NULL;
+	if(novo)
+		return &novo->k;
 }
 
-/* make an empty list */
-
-void create_list (list *L) {
+void create_list (list *L){
 	*L = NULL;
 }
 
-
-int searchStudents() {
-	
-	system("color 3");
+int searchStudents(){
+		
 	system("@cls||clear");
 	
 	list		C;	/* a class of students */
-	student		s, *p;
+	student		s, *novo;
 	int		    id;
-	FILE		*f;
+	
+	struct node *p = ultimo;
+	
+	FILE		*arq;
 
-	f = fopen ("list.txt", "r"); //alterado nome arquivo
-	if (!f) {
+	arq = fopen ("list.txt", "r"); //alterado nome arquivo
+	/*if (!f) {
 		perror ("List");
 		exit (1);
-	}
+	}*/
+	
+	if (arq == NULL){
+    printf(" > ERRO! O arquivo não foi aberto!\n");
+}else{
 
-	create_list (&C);
+	create_list(&C);
 
-	for (;;) {
-		fscanf (f, "%d %s %f\n", &s.id, s.name, &s.gpa);
-		if (feof (f))
+	for(;;){
+		fscanf (arq, "%d %s %f\n", &s.id, s.name, &s.gpa);
+		if (feof (arq))
       break;
 		insert_list (&C, s);
 	}
-	fclose (f);
+	
+	fclose (arq);
+	
+	}
 
 	for (;;) {
+		system("@cls||clear");
 		printf(" > Para voltar ao menu digite > 0 <\n\n");
 		printf(" > Qual o ID do aluno(a) que deseja procurar?\n > ");
 		scanf("%d", &id);
 
-		if (id == 0){
+		if(id == 0) //zero é mais fácil
            main();
-		}
-		
-		p = search_list (C, id);
 
+		novo = search_list (C, id);
 
-		if (!p){
-			system("@cls||clear");
+		if(!novo)
 			printf (" > O ID do aluno(a) > %d < nao foi encontrado!\n\n", id);
 			system("pause");
-			system("@cls||clear");			
-		}else{
-			system("@cls||clear");
+		while(p != NULL)
 			printf (" > Informacoes do aluno(a):\n");
-			printf (" > ID: %d \n > Nome: %s \n > Nota: %0.2f \n\n", p->id, p->name, p->gpa);
+			printf(" > ID: %d \n > Nome: %s \n > Nota: %0.2f \n\n", novo->id, novo->name, novo->gpa);
 			system("pause");
-			system("@cls||clear");
-		}
+		//	p = p->anterior;
 	}
-	exit (0);
+	//exit (0);
+}
+
+int insertStudents() { //funcao insert
+	
+	system("@cls||clear");
+	
+	//list		C;	/* a class of students */
+	//student		s, *novo;
+	int id, resp;
+	char name[100];
+	float gpa;
+	
+	FILE *arq;
+
+	arq = fopen ("list.txt", "a"); //alterado nome arquivo
+	/*if (!arq) {
+		perror ("List");
+		exit (1);
+	}*/
+	
+	if (arq == NULL){
+    printf(" > ERRO! O arquivo não foi aberto!\n");
+    
+    }else{
+
+	//create_list (&C);
+
+	/*for (;;) {
+		fscanf (arq, "%d %s %f\n", &s.id, s.name, &s.gpa);
+		if (feof (arq))
+      break;
+		insert_list (&C, s);*/
+		
+	    printf(" > Insira o ID do estudante: \n > ");
+		scanf("%d", &id);
+		printf("\n");
+		
+		printf(" > Insira o nome do estudante: \n > ");
+		scanf("%s", name);
+		printf("\n");
+		
+		printf(" > Insira a nota do estudante:\n > ");
+		scanf("%f", &gpa);
+		printf("\n");
+		
+		fprintf(arq, "\n");
+		fprintf(arq, "%d %s %2.f", id, name, gpa);
+	}
+	
+	printf("\n > Cadastrar outro aluno?\n");
+	printf(" > 1 < Sim\n > 2 < Não\n > ");
+	scanf("%d", &resp);
+	
+	if(resp == 1){
+		fclose (arq);
+		insertStudents();
+	}else{
+		fclose (arq);
+		main();
+	}
+
+	/*for (;;) {
+		printf ("Enter student ID: \n");
+		scanf("%d", &id);
+		
+		printf("Enter student name: \n");
+		scanf("%s", nome);
+		
+		printf("Enter student note: \n");
+		scanf("%f", &gpa);
+		
+		
+
+		if (id == 0) //zero ï¿½ mais fï¿½cil
+           main();
+
+		novo = search_list (C, id);
+
+
+		if (!novo)
+			printf ("ID #%d not found!\n", id);
+		else
+			printf ("%d\t%s\t%0.2f\n", novo->id, novo->name, novo->gpa);
+	}*/
+	
+	
 }
 
 int main(){ //inserido menu
@@ -111,14 +196,13 @@ int main(){ //inserido menu
 	int opcao;
 	
 	do{
-		system("@cls||clear");
-		printf(" ------------------------\n");
-		printf(" | > Escolha uma opcao  |\n");
-		printf(" |                      |\n");
-		printf(" | > 1 < Buscar Alunos  |\n");
-		printf(" | > 2 < Sair           |\n");
-		printf(" ------------------------\n");
-		printf(" > ");
+		printf(" --------------------------\n");
+		printf(" | > Escolha uma opcao    |\n");
+		printf(" |                        |\n");
+		printf(" | > 1 < Buscar Alunos    |\n");
+		printf(" | > 2 < Cadastrar Alunos |\n");
+		printf(" | > 3 < Sair             |\n");
+		printf(" --------------------------\n > ");
 		scanf("%d", &opcao);
 		
 		switch(opcao){
@@ -126,9 +210,9 @@ int main(){ //inserido menu
 			case 1:
 				searchStudents();
 				break;
-			
+				
 			case 2:
-				return 0;
+				insertStudents();
 				break;
 		}
 	}
